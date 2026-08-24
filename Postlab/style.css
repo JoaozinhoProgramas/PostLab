@@ -1,0 +1,28 @@
+:root {
+    --cor-primaria: #d71920;
+    --cor-texto: #202124;
+    --cor-fundo: #f5f6f8;
+    --cor-superficie: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.grade-posts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+@media (max-width: 850px) {
+    .grade-posts {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .grade-posts {
+        grid-template-columns: 1fr;
+    }
+}
