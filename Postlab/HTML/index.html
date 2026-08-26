@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Postlab</title>
+    <link rel="stylesheet" href="/CSS/style.css">
+</head>
+
+<body>
+    <header class="cabecalho">
+        <h1>PostLab</h1>
+        <button id="botao-recarregar" type="button">Recarregar dados</button>
+    </header>
+
+    <main>
+        <input id="campoBusca" type="search" placeholder="Buscar pelo título" />
+        <select id="filtro-usuario">
+            <option value="">Todos os autores</option>
+        </select>
+        <p id="contador-posts" aria-live="polite"></p>
+        <div id="estado-interface" role="status" aria-live="polite"></div>
+        
+        <!-- Seção de Posts -->
+        <section class="secao-posts">
+            <h2>Publicações</h2>
+            <div id="lista-posts" class="grade-posts"></div>
+        </section>
+
+        <!-- Nova seção de Usuários -->
+        <section class="secao-usuarios">
+            <h2>Usuários</h2>
+            <div id="lista-usuarios" class="grade-usuarios"></div>
+        </section>
+    </main>
+
+    <script src="/JS/app.js"></script>
+</body>
+
+</html>

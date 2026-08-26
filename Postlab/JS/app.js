@@ -1,0 +1,238 @@
+// ============================================================
+// CONFIGURAÇÃO GERAL
+// ============================================================
+
+// URL base da API pública usada para buscar posts e usuários fictícios
+const API_BASE = "https://jsonplaceholder.typicode.com";
+
+// Referências para os elementos do DOM que serão manipulados.
+// Centralizar tudo aqui facilita manutenção: se um ID mudar no HTML,
+// só precisa atualizar em um lugar.
+// ATENÇÃO: confira se os IDs abaixo batem exatamente com os do seu HTML
+// (ex.: "campoBusca" vs "campo-busca" — só um dos dois pode existir).
+const elementos = {
+  listaPosts: document.querySelector("#lista-posts"),       // container onde os cartões de post serão inseridos
+  estadoInterface: document.querySelector("#estado-interface"), // exibe mensagens de status/erro para o usuário
+  contadorPosts: document.querySelector("#contador-posts"), // mostra quantos posts foram encontrados
+  campoBusca: document.querySelector("#campoBusca"),        // input de busca por título
+  filtroUsuario: document.querySelector("#filtro-usuario"), // select para filtrar posts por autor
+  listaUsuarios: document.querySelector("#lista-usuarios") // lista usuarios
+};
+
+// Estado da aplicação (dados vindos da API + filtros aplicados pelo usuário)
+const estado = {
+  posts: [],       // lista completa de posts carregados da API
+  usuarios: [],    // lista completa de usuários carregados da API
+  termoBusca: "",  // texto digitado no campo de busca
+  usuarioId: "",   // id do usuário selecionado no filtro (string vazia = "todos")
+};
+
+// ============================================================
+// COMUNICAÇÃO COM A API
+// ============================================================
+
+/**
+ * Faz uma requisição GET para a API e retorna o JSON já convertido.
+ * Lança um erro se a resposta HTTP não for "ok" (status fora do range 200-299).
+ * @param {string} caminho - Endpoint relativo, ex: "/posts" ou "/users"
+ * @returns {Promise<any>} dados da resposta em JSON
+ */
+async function buscarJson(caminho) {
+  const resposta = await fetch(`${API_BASE}${caminho}`);
+
+  if (!resposta.ok) {
+    // Se o status HTTP indicar erro (404, 500, etc.), interrompe o fluxo
+    throw new Error(`Falha HTTP: ${resposta.status}`);
+  }
+
+  return resposta.json();
+}
+
+/**
+ * Orquestra o carregamento inicial dos dados:
+ * 1. Mostra mensagem de "carregando"
+ * 2. Busca posts e usuários em paralelo (Promise.all)
+ * 3. Atualiza o estado global
+ * 4. Popula o filtro de usuários
+ * 5. Aplica os filtros atuais (renderiza a lista)
+ * Em caso de erro, mostra mensagem amigável e loga o erro no console.
+ */
+async function carregarDados() {
+  mostrarEstado("Carregando publicações e autores...");
+
+  try {
+    // Promise.all dispara as duas requisições ao mesmo tempo,
+    // em vez de esperar uma terminar para começar a outra (mais rápido)
+    const [posts, usuarios] = await Promise.all([
+      buscarJson("/posts"),
+      buscarJson("/users"),
+    ]);
+
+    estado.posts = posts;
+    estado.usuarios = usuarios;
+
+    preencherFiltroDeUsuarios(); // popula o <select> com os nomes dos autores
+    aplicarFiltros();            // já renderiza a lista respeitando os filtros atuais
+    renderizarUsuarios(estado.usuarios)
+  } catch (erro) {
+    // Qualquer falha na busca (rede, HTTP, parsing) cai aqui
+    console.error("Falha ao carregar a API:", erro);
+    mostrarEstado("Não foi possível carregar os dados.", true);
+  }
+}
+
+// ============================================================
+// CRIAÇÃO E RENDERIZAÇÃO DE ELEMENTOS NA TELA
+// ============================================================
+
+/**
+ * Cria (mas NÃO insere no DOM) o elemento visual de um único post.
+ * Quem chama essa função é responsável por anexar o retorno em algum lugar
+ * da página (ex: via renderizarPosts).
+ * @param {{title: string, body: string}} post
+ * @returns {HTMLElement} elemento <article> pronto para ser inserido
+ */
+function criarCartaoPost(post) {
+  const artigo = document.createElement("article");
+  artigo.className = "post";
+
+  const titulo = document.createElement("h3");
+  titulo.textContent = post.title;
+
+  const corpo = document.createElement("p");
+  corpo.textContent = post.body;
+
+  artigo.append(titulo, corpo);
+  return artigo;
+}
+
+function criarCartaoUsuario(usuario) {
+  const artigo = document.createElement("article");
+  artigo.className = "usuario";
+
+  const nome = document.createElement("h3");
+  nome.textContent = usuario.name;
+
+  const email = document.createElement("p");
+  email.textContent = usuario.email;
+
+  const empresa = document.createElement("p");
+  empresa.textContent = usuario.company.name;
+
+  artigo.append(nome, email, empresa);
+  return artigo;
+}
+
+/**
+ * Limpa a lista atual na tela e insere os cartões correspondentes
+ * ao array de posts recebido (já filtrado).
+ * Usa DocumentFragment para inserir todos os elementos de uma vez só,
+ * evitando múltiplos reflows/repaints no navegador.
+ * @param {Array<object>} posts - posts já filtrados, prontos para exibir
+ */
+function renderizarPosts(posts) {
+  elementos.listaPosts.innerHTML = ""; // remove os cartões antigos
+
+  if (posts.length === 0) {
+    // Nenhum resultado bate com os filtros atuais
+    mostrarEstado("Nenhum post encontrado.");
+    elementos.contadorPosts.textContent = "";
+    return;
+  }
+
+  const fragmento = document.createDocumentFragment();
+  posts.forEach((post) => {
+    fragmento.append(criarCartaoPost(post));
+  });
+  elementos.listaPosts.append(fragmento);
+
+  elementos.contadorPosts.textContent = `${posts.length} post(s) encontrado(s)`;
+  mostrarEstado(""); // limpa qualquer mensagem de status/erro anterior
+}
+
+function renderizarUsuarios(usuarios) {
+  elementos.listaUsuarios.innerHTML = ""; // limpa a lista anterior
+
+  const fragmento = document.createDocumentFragment();
+  usuarios.forEach((usuario) => {
+    fragmento.append(criarCartaoUsuario(usuario));
+  });
+  elementos.listaUsuarios.append(fragmento);
+}
+
+/**
+ * Exibe uma mensagem de status para o usuário (ex: "Carregando...", erros, etc.)
+ * @param {string} mensagem - texto a ser exibido
+ * @param {boolean} ehErro - se true, adiciona a classe CSS "erro" para destaque visual
+ */
+function mostrarEstado(mensagem, ehErro = false) {
+  elementos.estadoInterface.textContent = mensagem;
+  elementos.estadoInterface.classList.toggle("erro", ehErro);
+}
+
+/**
+ * Popula o <select> de filtro com uma <option> para cada usuário carregado.
+ * Usa o id do usuário como valor (para comparar com post.userId depois)
+ * e o nome como texto visível.
+ */
+function preencherFiltroDeUsuarios() {
+  estado.usuarios.forEach((usuario) => {
+    const opcao = document.createElement("option");
+    opcao.value = usuario.id;
+    opcao.textContent = usuario.name;
+    elementos.filtroUsuario.append(opcao);
+  });
+}
+
+// ============================================================
+// LÓGICA DE FILTRAGEM
+// ============================================================
+
+/**
+ * Filtra estado.posts de acordo com o termo de busca (título) e o
+ * usuário selecionado, depois manda o resultado para renderização.
+ */
+function aplicarFiltros() {
+  const termo = estado.termoBusca.trim().toLowerCase();
+
+  const resultado = estado.posts.filter((post) => {
+    // Verifica se o título contém o termo digitado (case-insensitive)
+    const tituloCorresponde = post.title.toLowerCase().includes(termo);
+
+    // Se nenhum usuário estiver selecionado (""), aceita qualquer autor.
+    // Caso contrário, compara o id do post com o id escolhido no filtro.
+    const usuarioCorresponde =
+      !estado.usuarioId || String(post.userId) === estado.usuarioId;
+
+    return tituloCorresponde && usuarioCorresponde;
+  });
+
+  renderizarPosts(resultado);
+}
+
+// ============================================================
+// EVENTOS (interação do usuário)
+// ============================================================
+
+// Atualiza o termo de busca a cada tecla digitada e re-filtra a lista
+elementos.campoBusca.addEventListener("input", (evento) => {
+  estado.termoBusca = evento.target.value;
+  aplicarFiltros();
+});
+
+// Atualiza o usuário selecionado quando o <select> muda e re-filtra a lista
+elementos.filtroUsuario.addEventListener("change", (evento) => {
+  estado.usuarioId = evento.target.value;
+  aplicarFiltros();
+});
+
+// Botão que permite recarregar os dados da API manualmente
+const botaoRecarregar = document.querySelector("#botao-recarregar");
+botaoRecarregar.addEventListener("click", carregarDados);
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+
+// Dispara o carregamento assim que o script é executado
+carregarDados();
