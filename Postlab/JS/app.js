@@ -66,6 +66,7 @@ async function carregarDados() {
     const [posts, usuarios] = await Promise.all([
       buscarJson("/posts"),
       buscarJson("/users"),
+      buscarJson("todos")
     ]);
 
     estado.posts = posts;
@@ -235,4 +236,14 @@ botaoRecarregar.addEventListener("click", carregarDados);
 // ============================================================
 
 // Dispara o carregamento assim que o script é executado
+
+//Alterar pagina
+function AlterarPagina(TrocaPagina){
+  const seccao = document.querySelectorAll(".feed");
+
+  seccao.forEach ((seccao, i) => {
+    seccao.classList.toggle("ativo", i === TrocaPagina);
+
+  });
+}
 carregarDados();

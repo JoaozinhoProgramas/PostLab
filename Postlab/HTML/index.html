@@ -21,16 +21,23 @@
         <p id="contador-posts" aria-live="polite"></p>
         <div id="estado-interface" role="status" aria-live="polite"></div>
         
+        <button onclick="AlterarPagina(0)">Publicações</button>
+        <button onclick="AlterarPagina(1)">Usuarios</button>
+        <button onclick="AlterarPagina(2)">Tarefas</button>
+
         <!-- Seção de Posts -->
-        <section class="secao-posts">
-            <h2>Publicações</h2>
+        <section class="feed ativo">
             <div id="lista-posts" class="grade-posts"></div>
         </section>
 
-        <!-- Nova seção de Usuários -->
-        <section class="secao-usuarios">
-            <h2>Usuários</h2>
+        <!-- Seção Usuários -->
+        <section class="feed">
             <div id="lista-usuarios" class="grade-usuarios"></div>
+        </section>
+
+        <!--Seção Tarefas-->
+        <section class="feed">
+            <div id="lista-tarefas" class="grade-tarefas"></div>
         </section>
     </main>
 

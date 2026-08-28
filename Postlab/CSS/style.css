@@ -308,3 +308,13 @@ select:focus-visible {
   .tarefa { grid-template-columns: auto 1fr; }
   .tarefa__status { grid-column: 2; justify-self: start; }
 }
+
+/* Alterar feed*/
+
+.feed.ativo{
+  display: block;
+}
+
+.feed {
+  display: none;
+}
