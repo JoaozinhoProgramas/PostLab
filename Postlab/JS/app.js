@@ -16,13 +16,17 @@ const elementos = {
   contadorPosts: document.querySelector("#contador-posts"), // mostra quantos posts foram encontrados
   campoBusca: document.querySelector("#campoBusca"),        // input de busca por título
   filtroUsuario: document.querySelector("#filtro-usuario"), // select para filtrar posts por autor
-  listaUsuarios: document.querySelector("#lista-usuarios") // lista usuarios
+  listaUsuarios: document.querySelector("#lista-usuarios"), // lista usuarios
+  contadorUsuarios: document.querySelector("#contador-usuarios"), // mostra quantos usuarios foram encontrados
+  listaTarefas: document.querySelector("#lista-tarefas"), // lista tarefas
+  contadorTarefas: document.querySelector("#contador-tarefas") // mostra quantas tarefas foram encontradas
 };
 
 // Estado da aplicação (dados vindos da API + filtros aplicados pelo usuário)
 const estado = {
   posts: [],       // lista completa de posts carregados da API
   usuarios: [],    // lista completa de usuários carregados da API
+  tarefas: [],    // lista completa de tarefas carregadas da API
   termoBusca: "",  // texto digitado no campo de busca
   usuarioId: "",   // id do usuário selecionado no filtro (string vazia = "todos")
 };
@@ -63,18 +67,21 @@ async function carregarDados() {
   try {
     // Promise.all dispara as duas requisições ao mesmo tempo,
     // em vez de esperar uma terminar para começar a outra (mais rápido)
-    const [posts, usuarios] = await Promise.all([
+    const [posts, usuarios, tarefas] = await Promise.all([
       buscarJson("/posts"),
       buscarJson("/users"),
-      buscarJson("todos")
+      buscarJson("/todos")
     ]);
 
     estado.posts = posts;
     estado.usuarios = usuarios;
+    estado.tarefas = tarefas;
 
     preencherFiltroDeUsuarios(); // popula o <select> com os nomes dos autores
     aplicarFiltros();            // já renderiza a lista respeitando os filtros atuais
     renderizarUsuarios(estado.usuarios)
+    renderizarTarefas(estado.tarefas)
+
   } catch (erro) {
     // Qualquer falha na busca (rede, HTTP, parsing) cai aqui
     console.error("Falha ao carregar a API:", erro);
@@ -124,6 +131,26 @@ function criarCartaoUsuario(usuario) {
   return artigo;
 }
 
+function criarCartaoTarefa(tarefa) {
+  const artigo = document.createElement("article");
+  artigo.className = "tarefa";
+
+  const UserId = document.createElement("h3");
+  UserId.textContent = tarefa.userId;
+
+  const Id = document.createElement("p");
+  Id.textContent = tarefa.id;
+
+  const titulo = document.createElement("p");
+  titulo.textContent = tarefa.title;
+
+  const status = document.createElement("p");
+  status.textContent = tarefa.completed ? "Completa" : "Pendente";
+
+  artigo.append(UserId, Id, titulo, status);
+  return artigo;
+}
+
 /**
  * Limpa a lista atual na tela e insere os cartões correspondentes
  * ao array de posts recebido (já filtrado).
@@ -154,13 +181,42 @@ function renderizarPosts(posts) {
 function renderizarUsuarios(usuarios) {
   elementos.listaUsuarios.innerHTML = ""; // limpa a lista anterior
 
+  if (usuarios.length === 0) {
+    // Nenhum resultado bate com os filtros atuais 
+    mostrarEstado("Nenhum usuário encontrado.");
+    elementos.contadorUsuarios.textContent = "";
+    return;
+  }
+
   const fragmento = document.createDocumentFragment();
   usuarios.forEach((usuario) => {
     fragmento.append(criarCartaoUsuario(usuario));
   });
   elementos.listaUsuarios.append(fragmento);
+
+  elementos.contadorUsuarios.textContent = `${usuarios.length} usuario(s) encontrado(s)`;
+  mostrarEstado(""); // limpa qualquer mensagem de status/erro anterior
 }
 
+function renderizarTarefas(tarefas) {
+  elementos.listaTarefas.innerHTML = ""; // limpa a lista anterior
+
+  if (tarefas.length === 0) {
+    // Nenhum resultado bate com os filtros atuais 
+    mostrarEstado("Nenhuma tarefa encontrada.");
+    elementos.contadorTarefas.textContent = "";
+    return;
+  }
+
+  const fragmento = document.createDocumentFragment();
+  tarefas.forEach((tarefa) => {
+    fragmento.append(criarCartaoTarefa(tarefa));
+  });
+  elementos.listaTarefas.append(fragmento);
+
+  elementos.contadorTarefas.textContent = `${tarefas.length} tarefa(s) encontrado(s)`;
+  mostrarEstado(""); // limpa qualquer mensagem de status/erro anterior
+}
 /**
  * Exibe uma mensagem de status para o usuário (ex: "Carregando...", erros, etc.)
  * @param {string} mensagem - texto a ser exibido

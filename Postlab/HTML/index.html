@@ -18,7 +18,6 @@
         <select id="filtro-usuario">
             <option value="">Todos os autores</option>
         </select>
-        <p id="contador-posts" aria-live="polite"></p>
         <div id="estado-interface" role="status" aria-live="polite"></div>
         
         <button onclick="AlterarPagina(0)">Publicações</button>
@@ -27,21 +26,23 @@
 
         <!-- Seção de Posts -->
         <section class="feed ativo">
+            <p id="contador-posts" aria-live="polite"></p>
             <div id="lista-posts" class="grade-posts"></div>
         </section>
 
         <!-- Seção Usuários -->
         <section class="feed">
+            <p id="contador-usuarios" aria-live="polite"></p>
             <div id="lista-usuarios" class="grade-usuarios"></div>
         </section>
 
         <!--Seção Tarefas-->
         <section class="feed">
+            <p id="contador-tarefas" aria-live="polite"></p>
             <div id="lista-tarefas" class="grade-tarefas"></div>
         </section>
     </main>
 
     <script src="/JS/app.js"></script>
 </body>
-
 </html>
