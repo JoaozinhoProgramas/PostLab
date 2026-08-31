@@ -1,0 +1,475 @@
+/* ============================================================
+   VARIÁVEIS GLOBAIS (Design Tokens)
+   ============================================================ */
+:root {
+  /* Variáveis centralizam os tokens visuais e facilitam alterações futuras. */
+  --cor-primaria: #e400c5;
+  --cor-primaria-escura: #1900ff;
+  --cor-texto: #eeff00;
+  --cor-texto-suave: #5f6368;
+  --cor-fundo: #1c013b;
+  --cor-superficie: #010058;
+  --cor-borda: #011d42;
+  --cor-erro: #1eff00;
+  --cor-erro-fundo: #fff0f0;
+  --sombra: 0 10px 30px rgba(32, 33, 36, 0.08);
+  --raio: 14px;
+}
+
+/* ============================================================
+   RESET BÁSICO
+   ============================================================ */
+* {
+  /* Faz width e height incluírem padding e border no cálculo total. */
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+}
+
+/* Faz inputs, selects e botões herdarem a fonte do body em vez da fonte padrão do navegador */
+button,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: var(--cor-primaria);
+}
+
+/* ============================================================
+   LAYOUT GERAL
+   ============================================================ */
+.container {
+  /* Limita a largura em telas grandes e preserva margens em telas pequenas. */
+  width: min(1120px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+/* ---------- Cabeçalho ---------- */
+.cabecalho {
+  /* Gradiente institucional para destacar a área de abertura. */
+  color: #fff;
+  background: linear-gradient(135deg, #2600ff, var(--cor-primaria));
+  padding: 42px 0;
+}
+
+.cabecalho__conteudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.cabecalho__marca,
+.secao__rotulo {
+  margin: 0 0 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cabecalho h1 {
+  margin: 0;
+  /* clamp garante um tamanho de fonte fluido entre um mínimo e um máximo */
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1;
+}
+
+.cabecalho__descricao {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* ---------- Botão padrão ---------- */
+.botao {
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  color: var(--cor-primaria-escura);
+  background: #fff;
+  padding: 11px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.botao:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+}
+
+/* Estado de foco visível para acessibilidade (navegação por teclado) */
+.botao:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #ffd5d7;
+  outline-offset: 2px;
+}
+
+.conteudo-principal {
+  padding-block: 36px 56px;
+}
+
+/* ============================================================
+   NAVEGAÇÃO POR ABAS
+   ============================================================ */
+/* Navegação por abas: o botão ativo recebe cor e borda institucionais. */
+.abas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 6px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-superficie);
+  overflow-x: auto; /* permite rolar horizontalmente em telas estreitas */
+}
+
+.aba {
+  flex: 1;
+  min-width: 140px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--cor-texto-suave);
+  background: transparent;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aba:hover {
+  background: var(--cor-fundo);
+}
+
+/* Classe aplicada via JS na aba selecionada no momento */
+.aba--ativa {
+  color: #fff;
+  background: var(--cor-primaria);
+}
+
+.aba--ativa:hover {
+  background: var(--cor-primaria-escura);
+}
+
+/* Esconde o conteúdo da aba que não está selecionada (usa atributo hidden) */
+.painel-aba[hidden] {
+  display: none;
+}
+
+/* ============================================================
+   PAINEL DE CONTROLES (filtros/busca)
+   ============================================================ */
+.painel-controles {
+  /* Duas colunas: contextualização à esquerda e campos à direita. */
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 32px;
+  align-items: end;
+  padding: 24px;
+  margin-bottom: 34px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+.painel-controles--simples {
+  grid-template-columns: 1fr 1.4fr;
+}
+
+.painel-controles h2,
+.secao__cabecalho h2 {
+  margin: 0;
+}
+
+.secao__rotulo {
+  color: var(--cor-primaria);
+}
+
+.controles {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+}
+
+.campo {
+  display: grid;
+  gap: 6px;
+  color: var(--cor-texto-suave);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 9px;
+  color: var(--cor-texto);
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.secao__cabecalho {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.contador {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+}
+
+/* ============================================================
+   ÁREA DE ESTADO (carregando / vazio / erro)
+   ============================================================ */
+.estado {
+  /* Esta região será reutilizada para carregamento, vazio e erro. */
+  min-height: 74px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio);
+  color: var(--cor-texto-suave);
+  background: var(--cor-superficie);
+  padding: 18px;
+  text-align: center;
+}
+
+.estado--erro {
+  /* Classe aplicada pelo JavaScript somente quando ocorre falha. */
+  color: var(--cor-erro);
+  border-color: #e7aaaa;
+  background: var(--cor-erro-fundo);
+}
+
+.estado[hidden] {
+  /* O atributo hidden é controlado pelo JavaScript conforme o estado atual. */
+  display: none;
+}
+
+/* ============================================================
+   GRADES E CARTÕES DE CONTEÚDO
+   ============================================================ */
+
+/* ---------- Posts ---------- */
+.grade-posts {
+  /* Grade padrão com três colunas de mesma largura. */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.post {
+  /* Cada objeto recebido da API será apresentado como um cartão article. */
+  display: flex;
+  flex-direction: column;
+  min-height: 270px;
+  border: 1px solid var(--cor-borda);
+  border-top: 4px solid var(--cor-primaria);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  padding: 20px;
+  box-shadow: var(--sombra);
+}
+
+.post__autor {
+  margin: 0 0 8px;
+  color: var(--cor-primaria);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.post h3 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.post__corpo {
+  margin: 0 0 20px;
+  color: var(--cor-texto-suave);
+}
+
+.post__id {
+  margin: auto 0 0; /* empurra o id para o rodapé do cartão (flex + margin-top:auto) */
+  color: #8a8d92;
+  font-size: 0.8rem;
+}
+
+/* ---------- Usuários ---------- */
+/* Cartões de usuários apresentam informações em uma grade própria. */
+.grade-usuarios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.usuario {
+  border: 1px solid var(--cor-borda);
+  border-left: 5px solid var(--cor-primaria);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  padding: 20px;
+  box-shadow: var(--sombra);
+}
+
+.usuario h3 {
+  margin: 0 0 4px;
+}
+
+.usuario__username {
+  margin: 0 0 16px;
+  color: var(--cor-primaria);
+  font-weight: 700;
+}
+
+.usuario__dados {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  color: var(--cor-texto-suave);
+}
+
+/* ---------- Tarefas ---------- */
+/* Tarefas usam uma lista vertical para destacar status e responsável. */
+.lista-tarefas {
+  display: grid;
+  gap: 12px;
+}
+
+.tarefa {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* indicador | conteúdo | status */
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--cor-borda);
+  border-radius: 11px;
+  background: var(--cor-superficie);
+  padding: 15px 18px;
+}
+
+.tarefa__indicador {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--cor-primaria); /* pendente por padrão */
+}
+
+/* Quando a tarefa está concluída, o indicador e o selo de status mudam de cor */
+.tarefa--concluida .tarefa__indicador {
+  background: #198754;
+}
+
+.tarefa__titulo,
+.tarefa__responsavel {
+  margin: 0;
+}
+
+.tarefa__responsavel {
+  color: var(--cor-texto-suave);
+  font-size: 0.84rem;
+}
+
+.tarefa__status {
+  border-radius: 999px;
+  color: #8a1b1f;
+  background: #fde8e9;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.tarefa--concluida .tarefa__status {
+  color: #126336;
+  background: #e3f5ea;
+}
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
+.rodape {
+  color: var(--cor-texto-suave);
+  background: #eceef1;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.rodape p {
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+@media (max-width: 850px) {
+  /* Em tablets, controles empilham e a grade passa para duas colunas. */
+  .painel-controles,
+  .controles {
+    grid-template-columns: 1fr;
+  }
+
+  .grade-posts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .painel-controles--simples,
+  .grade-usuarios {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Em celulares, ações e resultados ocupam toda a largura disponível. */
+  .cabecalho__conteudo,
+  .secao__cabecalho {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .botao {
+    width: 100%;
+  }
+
+  .grade-posts {
+    grid-template-columns: 1fr;
+  }
+
+  /* Em telas muito pequenas, o selo de status desce para a segunda linha */
+  .tarefa {
+    grid-template-columns: auto 1fr;
+  }
+
+  .tarefa__status {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* ============================================================
+   ALTERNÂNCIA DE SEÇÕES (feed ativo)
+   ============================================================ */
+/* Controlado via JS (função AlterarPagina): alterna qual <section class="feed">
+   fica visível, adicionando/removendo a classe "ativo". */
+.feed.ativo {
+  display: block;
+}
+
+.feed {
+  display: none;
+}

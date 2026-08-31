@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Postlab</title>
+    <!-- Folha de estilos única, compartilhada por todas as seções -->
+    <link rel="stylesheet" href="/CSS/style.css">
+</head>
+
+<body>
+
+    <!-- Cabeçalho fixo no topo, com título e botão de recarregar dados da API -->
+    <header class="cabecalho">
+        <h1>PostLab</h1>
+        <button id="botao-recarregar" type="button">Recarregar dados</button>
+    </header>
+
+    <main>
+
+        <!-- Filtro de posts por autor. É populado dinamicamente via JS
+             (função preencherFiltroDeUsuarios) depois que os usuários chegam da API -->
+        <select id="filtro-usuario">
+            <option value="">Todos os autores</option>
+        </select>
+
+        <!-- Região de status/erro compartilhada pelas três seções.
+             O texto e a classe "erro" são controlados pela função mostrarEstado() no JS -->
+        <div id="estado-interface" role="status" aria-live="polite"></div>
+
+        <!-- Botões de navegação entre as seções (abas).
+             Cada botão chama AlterarPagina(indice) passando a posição da <section>
+             correspondente dentro da lista de elementos com classe "feed" (0, 1, 2) -->
+        <button onclick="AlterarPagina(0)">Publicações</button>
+        <button onclick="AlterarPagina(1)">Usuarios</button>
+        <button onclick="AlterarPagina(2)">Tarefas</button>
+
+        <!-- ============================================================
+             SEÇÃO 0: Posts (visível por padrão, tem a classe "ativo")
+             ============================================================ -->
+        <section class="feed ativo">
+            <input id="campoBusca" type="search" placeholder="Buscar pelo título" />
+            <p id="contador-posts" aria-live="polite"></p>
+            <!-- Container onde os cartões de post são inseridos via renderizarPosts() -->
+            <div id="lista-posts" class="grade-posts"></div>
+        </section>
+
+        <!-- ============================================================
+             SEÇÃO 1: Usuários
+             ============================================================ -->
+        <section class="feed">
+            <input id="campo-busca-usuario" type="search" placeholder="Buscar por nome ou email" />
+            <p id="contador-usuarios" aria-live="polite"></p>
+            <!-- Container onde os cartões de usuário são inseridos via renderizarUsuarios() -->
+            <div id="lista-usuarios" class="grade-usuarios"></div>
+        </section>
+
+        <!-- ============================================================
+             SEÇÃO 2: Tarefas
+             ============================================================ -->
+        <section class="feed">
+            <input id="campo-busca-tarefa" type="search" placeholder="Buscar pelo título" />
+            <select id="filtro-status-tarefa">
+                <option value="">Todas</option>
+                <option value="true">Completas</option>
+                <option value="false">Pendentes</option>
+            </select>
+            <p id="contador-tarefas" aria-live="polite"></p>
+            <!-- Container onde os cartões de tarefa são inseridos via renderizarTarefas() -->
+            <div id="lista-tarefas" class="grade-tarefas"></div>
+        </section>
+
+    </main>
+
+    <!-- Script principal: busca os dados na API, monta os cartões e liga os eventos -->
+    <script src="/JS/app.js"></script>
+</body>
+
+</html>
